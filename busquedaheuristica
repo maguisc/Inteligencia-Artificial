@@ -1,0 +1,58 @@
+import numpy as np 
+import matplotlib.pyplot as plt
+
+# Primer paso: Definir los límites de la cinta transportadora
+limite_x_min, limite_x_max = -10, 10
+limite_y_min, limite_y_max = -10, 10
+
+# Segundo paso: Definir la función que verifica si una posición está dentro de los límites
+def posicion_valida(posicion):
+    x, y = posicion
+    return limite_x_min <= x <= limite_x_max and limite_y_min <= y <= limite_y_max
+
+# Tercer paso: Definir la función para simular el montaje de los bloques del motor
+def simular_montaje(posicion_actual, posicion_correcta):
+    desplazamiento_x = np.random.uniform(-0.5, 0.5)
+    desplazamiento_y = np.random.uniform(-0.5, 0.5)
+    posicion_x = posicion_actual[0] + desplazamiento_x
+    posicion_y = posicion_actual[1] + desplazamiento_y
+    distancia = np.linalg.norm(np.array((posicion_x, posicion_y)) - np.array(posicion_correcta))
+    return posicion_x, posicion_y, distancia
+
+# Cuarto paso: Definir la función de búsqueda heurística
+def busqueda_heuristica(posicion_inicial, posicion_correcta):
+    mejor_posicion = posicion_inicial
+    menor_distancia = np.inf 
+
+    for _ in range(1000): 
+        # 4.1: Simulamos el montaje de la posición actual 
+        _, _, distancia = simular_montaje(mejor_posicion, posicion_correcta)
+        # 4.2: Actualizamos la mejor posición si se encuentra una más cercana a la posición correcta
+        if distancia < menor_distancia and posicion_valida(mejor_posicion):
+            menor_distancia = distancia 
+    return mejor_posicion
+
+# Quinto paso: Posición correcta del bloque de motor
+posicion_correcta = (0,1)
+
+# Sexto paso: Posición inicial de la búsqueda heurística 
+posicion_inicial = (8, -9)
+
+# Séptimo paso: Se realiza la búsqueda heurística 
+posicion_encontrada = busqueda_heuristica(posicion_inicial, posicion_correcta)
+
+# Octavo paso: Visualizamos el resultado
+plt.figure(figsize=(8, 8))
+plt.plot(*posicion_correcta, 'bo', label='Posición correcta')
+plt.plot(*posicion_inicial, 'go', label='Posición inicial')
+if posicion_encontrada:
+    plt.plot(*posicion_encontrada, 'ro', label='Mejor posición encontrada')
+    plt.xlim(limite_x_min - 1, limite_x_max + 1)
+    plt.ylim(limite_y_min - 1, limite_y_max + 1)
+    plt.xlabel('Posición x')
+    plt.xlabel('Posición y')
+    plt.title('Búsqueda Heurística de la Posición Correcta del Motor')
+    plt.grid(True)
+    plt.legend()
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
